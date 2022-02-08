@@ -1,8 +1,54 @@
 const jobs = require('../models/jobs');
 const candidate = require('../models/candidate');
+const employee = require('../models/employee');
 const feedback = require('../models/feedback');
 const express = require('express');
 const router = express.Router();
+
+router.post('/login', (req, res) => {
+    try {
+        // Finding user for verifying credentials
+        employee.find({ mail: req.body.mail }, (err, success) => {
+            if (err || success.length == 0) {
+                res.json({
+                    success: false,
+                    message: 'Invalid Credentials!'
+                });
+            } else {
+                const tokenCredentials = {
+                    userID: success[0]._id,
+                    name: success[0].name,
+                    mail: success[0].mail,
+                }
+                // let token = jwt.sign({ credentials: tokenCredentials }, config.get('jwtPrivateKey'));
+                bcrypt.compare(req.body.password, success[0].password, function (err, result) {
+                    console.log("Logged In : " + result);
+                    if (result == true) {
+                        console.log('---------------------------------------------');
+                        console.log("Logged In User Name: " + success[0].userName);
+                        console.log("Logged In User Mail: " + success[0].mail);
+                        console.log('---------------------------------------------');
+  
+                        // Sending response to client
+                        res.json({
+                            success: true,
+                            message: 'Authentication successful!',
+                            name: success[0].name,
+                            token: token
+                        });
+                    } else {
+                        res.json({
+                            success: false,
+                            message: 'Invalid Credentials!'
+                        });
+                    }
+                });
+            }
+        })
+    } catch (err) {
+        res.json(err)
+    }
+  })
 
 // routes for job postings - START
 router.get('/jobs',(req,res)=> {
@@ -31,12 +77,12 @@ router.get('/jobs/:job_id/candidates',(req,res)=>{
     let listOfCandidates;
     jobs.findOne({_id: req.params.job_id},(err,foundJob)=>{
         if(err){
-            res.send(err)
+            res.json(err)
         } else {
             foundJob.candidate_id.map( id => {
                 candidate.findOne({_id:id},(err,foundCandidate)=>{
                     if(err){
-                        res.send(err);
+                        res.json(err);
                     } else{
                         listOfCandidates.push(foundCandidate);
                     }
@@ -45,7 +91,7 @@ router.get('/jobs/:job_id/candidates',(req,res)=>{
         }
     })
 
-    res.send(listOfCandidates);
+    res.json(listOfCandidates);
 })
 // routes for getting list of candidates who are applied for jobs - END
 

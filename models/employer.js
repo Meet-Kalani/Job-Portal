@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 mongoose.connect("mongodb://localhost/Job-Portal", { useNewUrlParser: true, useUnifiedTopology: true});
 
 // Database Schema
-let interviewerSchema = new mongoose.Schema({
+let employerSchema = new mongoose.Schema({
     company_mail:String,
     password:String,
     contact:Number,
@@ -22,4 +22,4 @@ let interviewerSchema = new mongoose.Schema({
 })
 
 // Exporting Model
-module.exports = mongoose.model('Job-Portal', interviewerSchema);
+module.exports = mongoose.model('Job-Portal', employerSchema);

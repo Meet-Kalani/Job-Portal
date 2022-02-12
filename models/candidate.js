@@ -46,4 +46,4 @@ let candidateSchema = new mongoose.Schema({
 })
 
 // Exporting Model
-module.exports = mongoose.model('Job-Portal', candidateSchema);
+module.exports = mongoose.model('candidate', candidateSchema);

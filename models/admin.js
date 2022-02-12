@@ -13,4 +13,4 @@ let adminSchema = new mongoose.Schema({
 })
 
 // Exporting Model
-module.exports = mongoose.model('Job-Portal', adminSchema);
+module.exports = mongoose.model('admin', adminSchema);

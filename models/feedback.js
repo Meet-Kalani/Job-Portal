@@ -21,4 +21,4 @@ let feedbackSchema = new mongoose.Schema({
 })
 
 // Exporting Model
-module.exports = mongoose.model('Job-Portal', feedbackSchema);
+module.exports = mongoose.model('feedback', feedbackSchema);

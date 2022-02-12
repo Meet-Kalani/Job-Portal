@@ -22,4 +22,4 @@ let employerSchema = new mongoose.Schema({
 })
 
 // Exporting Model
-module.exports = mongoose.model('Job-Portal', employerSchema);
+module.exports = mongoose.model('employer', employerSchema);

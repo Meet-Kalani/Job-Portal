@@ -36,4 +36,4 @@ let jobsSchema = new mongoose.Schema({
 });
 
 // Exporting Model
-module.exports = mongoose.model("Job-Portal", jobsSchema);
+module.exports = mongoose.model("jobs", jobsSchema);

@@ -2,10 +2,7 @@
 const mongoose = require("mongoose");
 
 // Database Connection String
-mongoose.connect("mongodb://localhost/Job-Portal", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect("mongodb://localhost/Job-Portal", {useNewUrlParser: true,  useUnifiedTopology: true,});
 
 // Database Schema
 let jobsSchema = new mongoose.Schema({
@@ -14,6 +11,7 @@ let jobsSchema = new mongoose.Schema({
   designation: String,
   vacancy: Number,
   pay: Number,
+  company_name:String,
   company_id: {
     type: mongoose.Schema.Types.ObjectId,
   },
@@ -32,7 +30,10 @@ let jobsSchema = new mongoose.Schema({
   feedback_id: {
       type: mongoose.Schema.Types.ObjectId
   },
-  status: String
+  status: String,
+  perks: [String],
+  description_about_designation: String,
+  skills: [String]
 });
 
 // Exporting Model

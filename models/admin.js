@@ -6,7 +6,7 @@ mongoose.connect("mongodb://localhost/Job-Portal", { useNewUrlParser: true, useU
 
 // Database Schema
 let adminSchema = new mongoose.Schema({
-    mail: String,
+    admin_mail: String,
     password: String,
     admin_name: String,
     have_authority: Boolean    

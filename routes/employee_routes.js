@@ -2,8 +2,13 @@ const jobs = require('../models/jobs');
 const candidate = require('../models/candidate');
 const employee = require('../models/employee');
 const feedback = require('../models/feedback');
+const auth = require('../middleware/auth');
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const cors = require('cors');
+router.use(cors());
 
 router.post('/login', (req, res) => {
     try {
@@ -20,12 +25,12 @@ router.post('/login', (req, res) => {
                     name: success[0].name,
                     mail: success[0].mail,
                 }
-                // let token = jwt.sign({ credentials: tokenCredentials }, config.get('jwtPrivateKey'));
+                let token = jwt.sign({ credentials: tokenCredentials },'JustTheTwoOfUs');
                 bcrypt.compare(req.body.password, success[0].password, function (err, result) {
                     console.log("Logged In : " + result);
                     if (result == true) {
                         console.log('---------------------------------------------');
-                        console.log("Logged In User Name: " + success[0].userName);
+                        console.log("Logged In User Name: " + success[0].name);
                         console.log("Logged In User Mail: " + success[0].mail);
                         console.log('---------------------------------------------');
   
@@ -51,7 +56,11 @@ router.post('/login', (req, res) => {
   })
 
 // routes for job postings - START
-router.get('/jobs',(req,res)=> {
+router.get('/jobs',auth,(req,res)=> {
+    // Verifying Access Token
+    let token = req.headers['x-access-token'] || req.headers['authorization'];
+    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+
     jobs.find({},(err,success)=>{
         if(err){
             res.json(err);
@@ -61,7 +70,11 @@ router.get('/jobs',(req,res)=> {
     })
 })
 
-router.get('/jobs/:id',(req,res)=>{
+router.get('/jobs/:id',auth,(req,res)=>{
+    // Verifying Access Token
+    let token = req.headers['x-access-token'] || req.headers['authorization'];
+    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+
     jobs.findOne({_id: req.params.id},(err,success)=>{
         if(err){
             res.json(err);
@@ -73,44 +86,96 @@ router.get('/jobs/:id',(req,res)=>{
 // routes for job postings - END
 
 // routes for getting list of candidates who are applied for jobs - START
-router.get('/jobs/:job_id/candidates',(req,res)=>{
-    let listOfCandidates;
+router.get('/jobs/:job_id/candidates',auth,(req,res)=>{
+    // Verifying Access Token
+    let token = req.headers['x-access-token'] || req.headers['authorization'];
+    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+
+    let listOfCandidates = [];
     jobs.findOne({_id: req.params.job_id},(err,foundJob)=>{
         if(err){
             res.json(err)
         } else {
-            foundJob.candidate_id.map( id => {
+            let len = foundJob.candidate_id.length;
+            foundJob.candidate_id.map( (id,i)=> {
                 candidate.findOne({_id:id},(err,foundCandidate)=>{
                     if(err){
                         res.json(err);
                     } else{
-                        listOfCandidates.push(foundCandidate);
+                                    
+                        if(foundCandidate !== null){
+                            listOfCandidates.push(foundCandidate);
+                        }
+                        
+                        if(len === i+1){
+                            res.json(listOfCandidates)                     
+                        }
                     }
                 })
             })
         }
     })
-
-    res.json(listOfCandidates);
 })
 // routes for getting list of candidates who are applied for jobs - END
 
 // routes for feedback - START
+router.post('/jobs/:job_id/candidates/:candidate_id/feedback',auth,async(req,res)=>{
+    // Verifying Access Token
+    let token = req.headers['x-access-token'] || req.headers['authorization'];
+    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
 
-// router.post('/jobs/:job_id/candidates/:candidate_id/feedback',(req,res)=>{
-//     feedback.create({
-//         description: req.body.description,
-//         overall_feedback: req.body.overall_feedback,
-//         status: "Done",
-//         candidate_id: req.params.candidate_id,
-//         job_id: req.params.job_id,
-        
-//     })
-// })
+    // let feedback_data = await feedback.create({
+    //     description: req.body.description,
+    //     overall_feedback: req.body.overall_feedback,
+    //     status: "Done",
+    //     candidate_id: req.params.candidate_id,
+    //     job_id: req.params.job_id,
+    //     company_id:req.body.company_id
+    // })
+
+    
+
+    // candidate.update({_id:req.params.candidate_id},{$push:{feedback:dataToBePushed}},(err,success)=>{
+    //     if(err){
+    //         res.json(err)
+    //     } else{
+    //         console.log(success)
+    //         res.json({
+    //             success:true,
+    //             message:'Feedback has been saved.'
+    //         })
+    //     }
+    // })
+
+    let dataToBePushed = {
+        description: req.body.description,
+        overall_feedback: req.body.overall_feedback,
+        status: "Done",
+        job_id: req.params.job_id,
+        company_id:req.body.company_id
+    };
+
+    candidate.update({_id:req.params.candidate_id},{$push:{feedbacks:dataToBePushed}},(err,success)=>{
+            if(err){
+                res.json(err)
+            } else{
+                console.log(success)
+                res.json({
+                    success:true,
+                    message:'Feedback has been saved.'
+                })
+            }
+        })
+
+})
 // routes for feedback - END
 
 // routes for candidate's data - START
-router.get('/jobs/:job_id/candidates/:candidate_id',(req,res)=>{
+router.get('/jobs/:job_id/candidates/:candidate_id',auth,(req,res)=>{
+    // Verifying Access Token
+    let token = req.headers['x-access-token'] || req.headers['authorization'];
+    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+    
     candidate.findOne({_id:req.params.candidate_id},(err,success)=>{
         if(err){
             res.json(err);

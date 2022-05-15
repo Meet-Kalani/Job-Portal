@@ -1,3 +1,4 @@
+// Importing dependencies
 const jobs = require('../models/jobs');
 const candidate = require('../models/candidate');
 const employee = require('../models/employee');
@@ -10,6 +11,7 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 router.use(cors());
 
+// route for employee login
 router.post('/login', (req, res) => {
     try {
         // Finding user for verifying credentials
@@ -56,6 +58,7 @@ router.post('/login', (req, res) => {
   })
 
 // routes for job postings - START
+// route for getting all the jobs
 router.get('/jobs',auth,(req,res)=> {
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
@@ -70,6 +73,7 @@ router.get('/jobs',auth,(req,res)=> {
     })
 })
 
+// route for getting specific jobs by id
 router.get('/jobs/:id',auth,(req,res)=>{
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
@@ -123,29 +127,6 @@ router.post('/jobs/:job_id/candidates/:candidate_id/feedback',auth,async(req,res
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
     let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
-
-    // let feedback_data = await feedback.create({
-    //     description: req.body.description,
-    //     overall_feedback: req.body.overall_feedback,
-    //     status: "Done",
-    //     candidate_id: req.params.candidate_id,
-    //     job_id: req.params.job_id,
-    //     company_id:req.body.company_id
-    // })
-
-    
-
-    // candidate.update({_id:req.params.candidate_id},{$push:{feedback:dataToBePushed}},(err,success)=>{
-    //     if(err){
-    //         res.json(err)
-    //     } else{
-    //         console.log(success)
-    //         res.json({
-    //             success:true,
-    //             message:'Feedback has been saved.'
-    //         })
-    //     }
-    // })
 
     let dataToBePushed = {
         description: req.body.description,

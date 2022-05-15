@@ -1,3 +1,4 @@
+// Importing dependencies
 const jobs = require('../models/jobs');
 const candidate = require('../models/candidate');
 const employer = require('../models/employer');
@@ -12,6 +13,8 @@ const router = express.Router();
 const cors = require('cors');
 router.use(cors());
 
+// Admin routes - START
+// login route
 router.post('/login', (req, res) => {
     try {
         console.log(req.body);
@@ -29,11 +32,10 @@ router.post('/login', (req, res) => {
                     admin_name: success[0].admin_name,
                     admin_mail: success[0].admin_mail,
                 }
+                // Signning the jwt token
                 let token = jwt.sign({ credentials: tokenCredentials }, config.get('jwtPrivateKey'));
                 bcrypt.compare(req.body.password, success[0].password, function (err, result) {
                     console.log("Logged In : " + result);
-                    console.log(success[0].password,req.body.admin_password)
-                    console.log(err,result);
                     if (result == true) {
                         console.log('---------------------------------------------');
                         console.log("Logged In User Name: " + success[0].admin_name);
@@ -61,6 +63,7 @@ router.post('/login', (req, res) => {
     }
   })
 
+//   route for getting all the candidates there are on our site
 router.get('/candidates',auth,(req,res)=>{
     candidate.find({},{password: 0},(err,success)=>{
         if(err){
@@ -71,6 +74,7 @@ router.get('/candidates',auth,(req,res)=>{
     })
 })
 
+//   route for getting all the employers there are on our site
 router.get('/employers',auth,(req,res)=>{
     employer.find({},{password: 0},(err,success)=>{
         if(err){
@@ -82,6 +86,7 @@ router.get('/employers',auth,(req,res)=>{
 })
 
 // routes for CRUD operations of job postings - START
+// route for getting all the jobs that ar elisted on our site
 router.get('/jobs',(req,res)=> {
     jobs.find({},(err,success)=>{
         if(err){
@@ -92,6 +97,7 @@ router.get('/jobs',(req,res)=> {
     })
 })
 
+// route for getting specific job using its id
 router.get('/jobs/:id',(req,res)=>{
     jobs.findOne({_id: req.params.id},(err,success)=>{
         if(err){
@@ -102,6 +108,7 @@ router.get('/jobs/:id',(req,res)=>{
     })
 })
 
+// route for editing the job
 router.put('/jobs/:id',auth,(req,res)=>{
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
@@ -133,6 +140,7 @@ router.put('/jobs/:id',auth,(req,res)=>{
     })
 })
 
+// route for deleting the job
 router.delete('/jobs/:id',auth,(req,res)=>{
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
@@ -190,18 +198,6 @@ router.get('/jobs/:job_id/candidates/:candidate_id/feedback/:feedback_id',auth,(
     })
 })
 
-// router.post('/jobs/:job_id/candidates/:candidate_id/feedback',(req,res)=>{
-//     feedback.create({
-//         description: req.body.description,
-//         overall_feedback: req.body.overall_feedback,
-//         status: "Done",
-//         candidate_id: req.params.candidate_id,
-//         job_id: req.params.job_id,
-        
-//     })
-// })
-// routes for feedback - END
-
 // routes for candidate's data - START
 router.get('/jobs/:job_id/candidates/:candidate_id',auth,(req,res)=>{
     // Verifying Access Token
@@ -217,5 +213,6 @@ router.get('/jobs/:job_id/candidates/:candidate_id',auth,(req,res)=>{
     })
 })
 // routes for candidate's data - END
+// Admin routes - END
 
 module.exports = router;

@@ -1,3 +1,4 @@
+// Importing dependencies
 const employer = require("../models/employer");
 const candidate = require("../models/candidate");
 const feedback = require("../models/feedback");
@@ -11,6 +12,7 @@ const router = express.Router();
 const cors = require("cors");
 router.use(cors());
 
+// route for getting the current employers listed job
 router.get("/my-listed-jobs", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
@@ -41,6 +43,7 @@ router.get("/my-listed-jobs", auth, (req, res) => {
   });
 });
 
+// route for employer signup
 router.post("/signup", (req, res) => {
   console.log(req.body);
   try {
@@ -92,6 +95,7 @@ router.post("/signup", (req, res) => {
   }
 });
 
+// route for employer login
 router.post("/login", (req, res) => {
   try {
     // Finding user for verifying credentials
@@ -144,6 +148,7 @@ router.post("/login", (req, res) => {
   }
 });
 
+// route for getting specific employers information
 router.get("/:employer_id", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
@@ -158,29 +163,7 @@ router.get("/:employer_id", auth, (req, res) => {
   });
 });
 
-// routes for my listed jobs - START
-
-
-// router.get("/jobs",auth,(req,res)=>{
-//     console.log('ok')
-//     // Verifying Access Token
-//   try{
-//     let token = req.headers["x-access-token"] || req.headers["authorization"];
-//     let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
-  
-//     jobs.find({ _id :decoded.credentials.userID},(err,success)=>{
-//         if(err){
-//             res.json(err);
-//         } else{
-//             res.json(success);
-//             console.log(success)
-//         }
-//     })
-//   } catch(ex){
-//       console.log(ex);
-//   }
-// })
-
+// routes for creating jobs - START
 router.post("/jobs", auth, (req, res) => {
   console.log(req.body);
   // Verifying Access Token
@@ -234,6 +217,7 @@ router.post("/jobs", auth, (req, res) => {
   );
 });
 
+// route for editing job
 router.put("/jobs/:id", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
@@ -278,6 +262,7 @@ router.put("/jobs/:id", auth, (req, res) => {
   );
 });
 
+// route for deleting the job
 router.delete("/:job_id", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
@@ -291,7 +276,6 @@ router.delete("/:job_id", auth, (req, res) => {
     }
   });
 });
-// routes for my listed jobs - END
 
 // routes for getting list of candidates who are applied for jobs - START
 router.get("/jobs/:job_id/candidates", auth, (req, res) => {
@@ -318,9 +302,6 @@ router.get("/jobs/:job_id/candidates", auth, (req, res) => {
       );
     }
   });
-
-  // res.json(listOfCandidates);
-  // console.log(listOfCandidates);
 });
 // routes for getting list of candidates who are applied for jobs - END
 
@@ -350,16 +331,8 @@ router.get("/feedback/:job_id/:candidate_id", auth, async (req, res) => {
     _id: req.params.candidate_id,
   });
 
-  //   let feedbackData = await feedback.findOne({
-  //     "_id":{
-  //         $elemMatch:{
-  //             $eq =
-  //         }
-  //     }
-  //   })
 });
 // routes for feedback - END
 
 module.exports = router;
 
-// {_id:{$in:candidateData.feedback}} embed the enitere doc

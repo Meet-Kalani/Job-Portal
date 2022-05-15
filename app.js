@@ -1,3 +1,6 @@
+// Main entry point for the application
+
+// Importing dependenices
 const admin_routes = require("./routes/admin_routes");
 const employee_routes = require("./routes/employee_routes");
 const candidate_routes = require("./routes/candidate_routes");
@@ -16,6 +19,22 @@ if (!config.get('jwtPrivateKey') || !config.get('smtpUsername') || !config.get('
     process.exit(1);
 }
 
+// configuring cloudinary
+cloudinary.config({
+    cloud_name: config.get('cloudinary_cloud_name'),
+    api_key: config.get('cloudinary_api_key'),
+    api_secret: config.get('cloudinary_api_secret')
+});
+
+// configuring routes for modular application
+app.use(express.json());
+app.use('/admin',admin_routes);
+app.use('/employee',employee_routes);
+app.use('/candidate',candidate_routes);
+app.use('/employer',employer_routes);
+
+
+// Configuring socket.io
 const server = http.createServer(app);
 const io = new Server(server,{
     cors:{
@@ -23,18 +42,6 @@ const io = new Server(server,{
         methods:["GET","POST"],
     }
 });
-
-cloudinary.config({
-    cloud_name: 'meetkalani',
-    api_key: '614945554319442',
-    api_secret: "u_nX1qZs6QQzC9Uq5Kc4OS6JI-4"
-});
-
-app.use(express.json());
-app.use('/admin',admin_routes);
-app.use('/employee',employee_routes);
-app.use('/candidate',candidate_routes);
-app.use('/employer',employer_routes);
 
 io.on('connection',socket => {
     console.log('User Connected: '+socket.id);;
@@ -54,6 +61,7 @@ io.on('connection',socket => {
     })
 })
 
+// listening for the request
 server.listen(PORT,()=>{
     console.log(`Server has started at port: ${PORT}`);
 })

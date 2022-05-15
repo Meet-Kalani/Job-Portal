@@ -1,3 +1,4 @@
+// Importing dependencies
 const jobs = require("../models/jobs");
 const candidate = require("../models/candidate");
 const feedback = require("../models/feedback");
@@ -15,12 +16,14 @@ const config = require('config');
 const nodemailer = require('nodemailer');
 router.use(cors());
 
+// Configuring cloudinary for uploading assets to the cloud
 cloudinary.config({
   cloud_name: config.get('cloudinary_cloud_name'),
   api_key: config.get('cloudinary_api_key'),
   api_secret: config.get('cloudinary_api_secret')
 });
 
+// route for candidate signup
 router.post("/signup", (req, res) => {
   try {
     // Checking if user Exists
@@ -66,6 +69,7 @@ router.post("/signup", (req, res) => {
   }
 });
 
+// route for candidate login
 router.post("/login", (req, res) => {
   try {
     // Finding user for verifying credentials
@@ -119,6 +123,7 @@ router.post("/login", (req, res) => {
 });
 
 // routes for job postings - START
+// route for fetching all the jobs 
 router.get("/jobs", (req, res) => {
   jobs.find({}, (err, success) => {
     if (err) {
@@ -129,6 +134,7 @@ router.get("/jobs", (req, res) => {
   });
 });
 
+// route for fetching jobs that are having specific search tags
 router.get("/jobs/search/:tagName", (req, res) => {
   var searchKey = new RegExp(req.params.tagName, 'i')
 
@@ -143,6 +149,7 @@ router.get("/jobs/search/:tagName", (req, res) => {
   });
 });
 
+// route for fetching specific job using its id
 router.get("/jobs/:id", (req, res) => {
   jobs.findOne({ _id: req.params.id }, (err, success) => {
     if (err) {
@@ -178,18 +185,8 @@ router.post("/contact",async(req,res)=>{
 })
 // routes for contact - END
 
-// router.delete('/:candidate_id',auth,(req,res)=>{
-//   candidate.findOneAndDelete({_id:req.params.candidate_id},(err,success)=>{
-//     if(err){
-//       res.json(err)
-//     } else{
-//       console.log(success);
-//       res.json(success);
-//     }
-//   })
-// })
-
 // routes for candidate profile - START
+// route for getting candidate's profile using jwt
 router.get("/profile", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
@@ -204,6 +201,7 @@ router.get("/profile", auth, (req, res) => {
   });
 });
 
+// route for getting candidate's profile using url params
 router.get("/profile/:profile_id", (req, res) => {
   candidate.findOne({ _id: req.params.profile_id }, (err, success) => {
     if (err) {
@@ -214,6 +212,7 @@ router.get("/profile/:profile_id", (req, res) => {
   });
 });
 
+// route for editing candidate's profile
 router.put("/profile/:candidate_id/edit", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];

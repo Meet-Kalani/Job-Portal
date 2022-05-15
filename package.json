@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Meet Kalani",
   "license": "ISC",
   "dependencies": {
@@ -18,5 +15,11 @@
     "mongoose": "^6.1.6",
     "nodemailer": "^6.7.3",
     "socket.io": "^4.4.1"
+  },
+  "scripts":{
+    "start":"node app.js"
+  },
+  "engines":{
+    "node":"16.14.0"
   }
 }

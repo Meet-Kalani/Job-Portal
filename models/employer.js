@@ -1,8 +1,9 @@
 // Importing Dependencies
 const mongoose = require('mongoose');
+const config = require('config');
 
 // Database Connection String
-mongoose.connect("mongodb://localhost/Job-Portal", { useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(`mongodb+srv://admin:${config.get('dbPassword')}@mongodb-job-portal.hzueb.mongodb.net/Job-Portal?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true});
 
 // Database Schema
 let employerSchema = new mongoose.Schema({

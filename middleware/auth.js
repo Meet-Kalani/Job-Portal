@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
             res.status(401).send('Access denied! No token provided');
         } else {
             // verifying headers
-            let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+            let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
             req.decoded = decoded;
             next();
         }

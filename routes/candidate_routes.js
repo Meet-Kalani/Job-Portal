@@ -11,13 +11,14 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const cloudinary = require('cloudinary');
+const config = require('config');
 const nodemailer = require('nodemailer');
 router.use(cors());
 
 cloudinary.config({
-  cloud_name: "meetkalani",
-  api_key: "614945554319442",
-  api_secret: "u_nX1qZs6QQzC9Uq5Kc4OS6JI-4"
+  cloud_name: config.get('cloudinary_cloud_name'),
+  api_key: config.get('cloudinary_api_key'),
+  api_secret: config.get('cloudinary_api_secret')
 });
 
 router.post("/signup", (req, res) => {
@@ -82,7 +83,7 @@ router.post("/login", (req, res) => {
         };
         let token = jwt.sign(
           { credentials: tokenCredentials },
-          "JustTheTwoOfUs"
+          config.get('jwtPrivateKey')
         );
         bcrypt.compare(
           req.body.password,
@@ -156,11 +157,12 @@ router.get("/jobs/:id", (req, res) => {
 // routes for contact - START
 router.post("/contact",async(req,res)=>{
   const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
+    host: 'smtp.ethreal.com',
+    port:587,
+    secure:false,
     auth: {
-        user: 'laap6bauflvwbw5m@ethereal.email',
-        pass: '1fKsgpJFe6Py2UYnfn'
+        user: config.get('smtpUsername'),
+        pass: config.get('smtpPassword')
     }
 });
 
@@ -191,7 +193,7 @@ router.post("/contact",async(req,res)=>{
 router.get("/profile", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
-  let decoded = jwt.verify(token, "JustTheTwoOfUs");
+  let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
   candidate.findOne({ _id: decoded.credentials.userID }, (err, success) => {
     if (err) {
@@ -215,7 +217,7 @@ router.get("/profile/:profile_id", (req, res) => {
 router.put("/profile/:candidate_id/edit", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
-  let decoded = jwt.verify(token, "JustTheTwoOfUs");
+  let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
   let delimetedSkills = req.body.skills.trim().split(/\s+/);
 
@@ -269,7 +271,7 @@ router.put("/profile/:candidate_id/edit", auth, (req, res) => {
 router.get("/:job_id/apply", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
-  let decoded = jwt.verify(token, "JustTheTwoOfUs");
+  let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
   jobs.findOneAndUpdate(
     { _id: req.params.job_id },
@@ -306,14 +308,15 @@ router.get("/:job_id/apply", auth, (req, res) => {
 router.get("/applied-jobs", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
-  let decoded = jwt.verify(token, "JustTheTwoOfUs");
-
+  let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
+  
   candidate.findOne(
     { _id: decoded.credentials.userID },
     (err, foundCandidate) => {
       if (err) {
         res.json(err);
       } else {
+        console.log(foundCandidate)
         jobs.find(
           { _id: { $in: foundCandidate.applied_jobs } },
           (err, success) => {
@@ -333,7 +336,7 @@ router.get("/applied-jobs", auth, (req, res) => {
 router.get("/review-application", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
-  let decoded = jwt.verify(token, "JustTheTwoOfUs");
+  let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
   candidate.findOne({ _id: decoded.credentials.userID }, (err, success) => {
     if (err) {
@@ -349,7 +352,7 @@ router.get("/review-application", auth, (req, res) => {
 router.get("/feedback/:job_id/:candidate_id", auth, async (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
-  let decoded = jwt.verify(token, "JustTheTwoOfUs");
+  let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
   let candidateData = await candidate.findById({
     _id: req.params.candidate_id,
@@ -363,7 +366,7 @@ router.get("/feedback/:job_id/:candidate_id", auth, async (req, res) => {
 router.get("/create-chatroom/:job_id", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
-  let decoded = jwt.verify(token, "JustTheTwoOfUs");
+  let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
   chatroom.create(
     {
@@ -398,7 +401,7 @@ router.get("/create-chatroom/:job_id", auth, (req, res) => {
 router.get("/chatroom/:candidate_id", auth, (req, res) => {
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
-  let decoded = jwt.verify(token, "JustTheTwoOfUs");
+  let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
   chatroom.find(
     { candidate_id: decoded.credentials.userID },
@@ -412,5 +415,7 @@ router.get("/chatroom/:candidate_id", auth, (req, res) => {
   );
 });
 // Chatroom - END
+
+
 
 module.exports = router;

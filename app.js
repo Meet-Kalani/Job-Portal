@@ -7,7 +7,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const cloudinary = require('cloudinary');
 const http = require('http');
+const config = require('config');
 const {Server} = require('socket.io');
+
+// Confirming that Environment variables are set
+if (!config.get('jwtPrivateKey') || !config.get('smtpUsername') || !config.get('smtpPassword') || !config.get('dbPassword') || !config.get('cloudinary_cloud_name') || !config.get('cloudinary_api_key') || !config.get('cloudinary_api_secret')) {
+    console.log('FATAL ERROR: Environment variables are not defined');
+    process.exit(1);
+}
 
 const server = http.createServer(app);
 const io = new Server(server,{

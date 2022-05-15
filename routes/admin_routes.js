@@ -7,6 +7,7 @@ const auth = require('../middleware/auth');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const express = require('express');
+const config = require('config');
 const router = express.Router();
 const cors = require('cors');
 router.use(cors());
@@ -28,7 +29,7 @@ router.post('/login', (req, res) => {
                     admin_name: success[0].admin_name,
                     admin_mail: success[0].admin_mail,
                 }
-                let token = jwt.sign({ credentials: tokenCredentials }, 'JustTheTwoOfUs');
+                let token = jwt.sign({ credentials: tokenCredentials }, config.get('jwtPrivateKey'));
                 bcrypt.compare(req.body.password, success[0].password, function (err, result) {
                     console.log("Logged In : " + result);
                     console.log(success[0].password,req.body.admin_password)
@@ -104,7 +105,7 @@ router.get('/jobs/:id',(req,res)=>{
 router.put('/jobs/:id',auth,(req,res)=>{
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
-    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+    let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
     // Breaking down tags to separate them with "," (comma)
     delimetedTags = req.body.tags.trim().split(/\s+/);
@@ -135,7 +136,7 @@ router.put('/jobs/:id',auth,(req,res)=>{
 router.delete('/jobs/:id',auth,(req,res)=>{
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
-    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+    let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
     jobs.deleteOne({_id:req.params.id},(err,success)=>{
         if(err){
@@ -151,7 +152,7 @@ router.delete('/jobs/:id',auth,(req,res)=>{
 router.get('/jobs/:job_id/candidates',auth,(req,res)=>{
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
-    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+    let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
     let listOfCandidates;
     jobs.findOne({_id: req.params.job_id},(err,foundJob)=>{
@@ -178,7 +179,7 @@ router.get('/jobs/:job_id/candidates',auth,(req,res)=>{
 router.get('/jobs/:job_id/candidates/:candidate_id/feedback/:feedback_id',auth,(req,res)=>{
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
-    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+    let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
     feedback.findOne({_id: req.params.feedback_id},(err,success)=>{
         if(err){
@@ -205,7 +206,7 @@ router.get('/jobs/:job_id/candidates/:candidate_id/feedback/:feedback_id',auth,(
 router.get('/jobs/:job_id/candidates/:candidate_id',auth,(req,res)=>{
     // Verifying Access Token
     let token = req.headers['x-access-token'] || req.headers['authorization'];
-    let decoded = jwt.verify(token, 'JustTheTwoOfUs');
+    let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
     candidate.findOne({_id:req.params.candidate_id},(err,success)=>{
         if(err){

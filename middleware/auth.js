@@ -1,5 +1,6 @@
 // Importing packages
 const jwt = require('jsonwebtoken');
+const config = require('config');
 
 // Middleware function for authorization
 module.exports = (req, res, next) => {
@@ -16,6 +17,7 @@ module.exports = (req, res, next) => {
             next();
         }
     } catch (err) {
+    console.log(err)
         res.send(err);
     }
 }

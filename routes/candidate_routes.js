@@ -188,14 +188,17 @@ router.post("/contact",async(req,res)=>{
 // routes for candidate profile - START
 // route for getting candidate's profile using jwt
 router.get("/profile", auth, (req, res) => {
+  console.log('in')
   // Verifying Access Token
   let token = req.headers["x-access-token"] || req.headers["authorization"];
   let decoded = jwt.verify(token, config.get('jwtPrivateKey'));
 
   candidate.findOne({ _id: decoded.credentials.userID }, (err, success) => {
     if (err) {
+      console.log(err)
       res.json(err);
     } else {
+      console.log(success);
       res.json(success);
     }
   });
